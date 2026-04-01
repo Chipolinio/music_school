@@ -4,7 +4,7 @@ from enum import Enum as SQLEnum
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from src.models import Base
+from src.models.Base import BaseModel
 
 if TYPE_CHECKING:
     from .User import User
@@ -18,7 +18,7 @@ class MessageType(SQLEnum):
     SYSTEM = "system"
 
 
-class Notification(Base):
+class Notification(BaseModel):
     __tablename__ = "notifications"
     user_id: Mapped[int] = mapped_column(
         Integer,

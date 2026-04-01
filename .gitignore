@@ -19,3 +19,6 @@ htmlcov/
 .DS_Store
 
 *.log
+/.instuctions
+/.output
+/.qwen

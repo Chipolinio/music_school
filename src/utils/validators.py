@@ -64,13 +64,6 @@ def date_validator(value: Any):
     return value
 
 
-def telegram_id_validator(value: Any):
-    """Проверка Telegram ID (должен быть положительным целым числом)"""
-    if not isinstance(value, int) or value <= 0:
-        raise ValueError("Invalid Telegram ID")
-    return value
-
-
 def time_range_validator(start: datetime, end: datetime):
     if end <= start:
         raise ValueError("End time must be after start time")

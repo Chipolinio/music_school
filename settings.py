@@ -1,9 +1,11 @@
 from dotenv import load_dotenv
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+import os
 
 BASE_DIR = Path(__file__).resolve().parent
-load_dotenv(dotenv_path=str(BASE_DIR / ".env"))
+# Переопределяем переменные окружения значениями из .env
+load_dotenv(dotenv_path=str(BASE_DIR / ".env"), override=True)
 
 class Settings(BaseSettings):
     POSTGRES_DB: str

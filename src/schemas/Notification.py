@@ -9,7 +9,13 @@ class NotificationBase(BaseModel):
         ge=1,
         description="ID пользователя, которому пришло уведомление"
     )]
-    text: Annotated[str, Field(
+    title: Annotated[str, Field(
+        ...,
+        min_length=1,
+        max_length=150,
+        description="Заголовок уведомления"
+    )]
+    message: Annotated[str, Field(
         ...,
         min_length=1,
         max_length=1000,
@@ -38,7 +44,6 @@ class NotificationResponse(NotificationBase):
 
 
 class NotificationUpdate(BaseModel):
-
     is_read: Annotated[Optional[bool], Field(None)]
 
     model_config = ConfigDict(str_strip_whitespace=True)

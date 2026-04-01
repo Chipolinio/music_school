@@ -2,7 +2,7 @@ from typing import Annotated, Optional
 from enum import Enum
 from pydantic import BaseModel, Field, ConfigDict, field_validator, StrictInt
 
-from src.utils.validators import name_validator, phone_validator, telegram_id_validator
+from src.utils.validators import name_validator, phone_validator
 
 class UserRole(str, Enum):
     STUDENT = "STUDENT"
@@ -10,11 +10,6 @@ class UserRole(str, Enum):
     ADMIN = "ADMIN"
 
 class UserBase(BaseModel):
-    telegram_id: Annotated[StrictInt, Field(
-        ...,
-        description="Telegram ID пользователя",
-        examples=[555666777]
-    )]
     phone: Annotated[str, Field(
         ...,
         description="Номер телефона в международном формате",
@@ -40,11 +35,6 @@ class UserBase(BaseModel):
     @classmethod
     def validate_phone(cls, v):
         return phone_validator(v)
-
-    @field_validator("telegram_id", mode="after")
-    @classmethod
-    def validate_tg_id(cls, v):
-        return telegram_id_validator(v)
 
     model_config = ConfigDict(str_strip_whitespace=True)
 

@@ -4,7 +4,7 @@ from enum import Enum as SQLEnum
 from datetime import datetime
 from typing import List
 
-from src.models import Base
+from src.models.Base import BaseModel
 
 
 class LessonType(SQLEnum):
@@ -12,7 +12,7 @@ class LessonType(SQLEnum):
     LESSON = "LESSON"
 
 
-class LessonSlot(Base):
+class LessonSlot(BaseModel):
     __tablename__ = "lesson_slots"
     teacher_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     room_id: Mapped[int] = mapped_column(Integer, ForeignKey("rooms.id", ondelete="CASCADE"), nullable=False)

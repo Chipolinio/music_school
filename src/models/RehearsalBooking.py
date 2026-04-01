@@ -2,14 +2,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, DateTime, ForeignKey, Enum
 from enum import Enum as SQLEnum
 from datetime import datetime
-from src.models import Base
+from src.models.Base import BaseModel
 
 class Status(SQLEnum):
     BOOKED = "BOOKED"
     FREE = "FREE"
     TAKEN = "TAKEN"
 
-class RehearsalBooking(Base):
+class RehearsalBooking(BaseModel):
     __tablename__ = "rehearsal_bookings"
     student_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
     room_id: Mapped[int] = mapped_column(Integer, ForeignKey("rooms.id"), nullable=False)
