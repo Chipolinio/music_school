@@ -1,8 +1,7 @@
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import Annotated, Optional, List
 from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator, StrictInt
 
-# Импортируем твой валидатор дат
 from src.utils.validators import date_validator
 
 
@@ -74,3 +73,28 @@ class RehearsalUpdate(BaseModel):
         return self
 
     model_config = ConfigDict(str_strip_whitespace=True)
+
+
+# =============================================================================
+# API RESPONSES
+# =============================================================================
+
+class RehearsalListResponse(BaseModel):
+    """Список бронирований репетиций."""
+    rehearsals: Annotated[List[RehearsalResponse], Field(..., description="Список репетиций")]
+    total: Annotated[int, Field(..., description="Общее количество", ge=0)]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RehearsalCreateResponse(BaseModel):
+    """Ответ на создание бронирования репетиции."""
+    rehearsal: RehearsalResponse
+    message: Annotated[str, Field(..., description="Сообщение об успехе")]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RehearsalCancelResponse(BaseModel):
+    """Ответ на отмену репетиции."""
+    message: Annotated[str, Field(..., description="Сообщение об успехе")]

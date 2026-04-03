@@ -3,9 +3,32 @@ from sqlalchemy import select, update
 from src.repositories.BaseRepository import BaseRepository
 from src.models.Notification import Notification
 
+
 class NotificationRepository(BaseRepository[Notification]):
     def __init__(self, session: AsyncSession):
         super().__init__(Notification, session)
+
+    async def create_notification(
+        self,
+        user_id: int,
+        title: str,
+        message: str,
+        msg_type: str = "INFO",
+        is_read: bool = False,
+    ) -> Notification:
+        """Создаёт уведомление."""
+        from src.models.Notification import MessageType
+        notification = self.model(
+            user_id=user_id,
+            title=title,
+            message=message,
+            type=MessageType(msg_type),
+            is_read=is_read,
+        )
+        self.session.add(notification)
+        await self.session.flush()
+        await self.session.refresh(notification)
+        return notification
 
     async def get_unread(self, user_id: int):
         stmt = select(self.model).where(

@@ -1,16 +1,52 @@
-# This is a sample Python script.
+"""
+Music School Management System - API Application
+"""
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+
+from src.api.error_handler import register_exception_handlers
+from src.api.router import api_router
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+def create_app() -> FastAPI:
+    """Создаёт и настраивает приложение FastAPI."""
+    
+    app = FastAPI(
+        title="Music School Management System",
+        description="API для управления музыкальной школой",
+        version="1.0.0",
+    )
+    
+    # CORS middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Настроить для прода: ["http://localhost:3000", "https://yourdomain.com"]
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    
+    # Обработчики исключений
+    register_exception_handlers(app)
+    
+    # Middleware для установки заголовков (для будущей настройки фронта)
+    @app.middleware("http")
+    async def add_security_headers(request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        return response
+    
+    # Подключение роутеров
+    app.include_router(api_router)
+    
+    # Health check
+    @app.get("/health", tags=["Health"])
+    async def health_check():
+        return {"status": "ok"}
+    
+    return app
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+app = create_app()

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import Annotated, Optional, List
 from pydantic import BaseModel, Field, ConfigDict, StrictInt
 
 
@@ -47,3 +47,33 @@ class NotificationUpdate(BaseModel):
     is_read: Annotated[Optional[bool], Field(None)]
 
     model_config = ConfigDict(str_strip_whitespace=True)
+
+
+# =============================================================================
+# API RESPONSES
+# =============================================================================
+
+class NotificationListResponse(BaseModel):
+    """Список уведомлений."""
+    notifications: Annotated[List[NotificationResponse], Field(..., description="Список уведомлений")]
+    unread_count: Annotated[int, Field(..., description="Количество непрочитанных", ge=0)]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class NotificationCreateResponse(BaseModel):
+    """Ответ на создание уведомления."""
+    notification: NotificationResponse
+    message: Annotated[str, Field(..., description="Сообщение об успехе")]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class NotificationMarkAsReadResponse(BaseModel):
+    """Ответ на пометку уведомления как прочитанного."""
+    message: Annotated[str, Field(..., description="Сообщение об успехе")]
+
+
+class NotificationMarkAllAsReadResponse(BaseModel):
+    """Ответ на пометку всех уведомлений как прочитанных."""
+    message: Annotated[str, Field(..., description="Сообщение об успехе")]

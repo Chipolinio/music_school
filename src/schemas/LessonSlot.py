@@ -1,8 +1,7 @@
-from typing import Annotated, Optional
+from typing import Annotated, Optional, List
 from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator, StrictInt
 
-# Импортируем твой валидатор дат
 from src.utils.validators import date_validator
 
 
@@ -84,3 +83,36 @@ class LessonSlotUpdate(BaseModel):
         return self
 
     model_config = ConfigDict(str_strip_whitespace=True)
+
+
+# =============================================================================
+# API RESPONSES
+# =============================================================================
+
+class LessonSlotListResponse(BaseModel):
+    """Список слотов уроков с пагинацией."""
+    slots: Annotated[List[LessonSlotResponse], Field(..., description="Список слотов")]
+    total: Annotated[int, Field(..., description="Общее количество", ge=0)]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class LessonSlotCreateResponse(BaseModel):
+    """Ответ на создание слота."""
+    slot: LessonSlotResponse
+    message: Annotated[str, Field(..., description="Сообщение об успехе")]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class LessonSlotUpdateResponse(BaseModel):
+    """Ответ на обновление слота."""
+    slot: LessonSlotResponse
+    message: Annotated[str, Field(..., description="Сообщение об успехе")]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class LessonSlotDeleteResponse(BaseModel):
+    """Ответ на удаление слота."""
+    message: Annotated[str, Field(..., description="Сообщение об успехе")]

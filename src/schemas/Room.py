@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated, Optional, List
 from pydantic import BaseModel, Field, ConfigDict, field_validator, StrictInt
 
 from src.utils.validators import name_validator
@@ -58,3 +58,36 @@ class RoomUpdate(BaseModel):
         return name_validator(v)
 
     model_config = ConfigDict(str_strip_whitespace=True)
+
+
+# =============================================================================
+# API RESPONSES
+# =============================================================================
+
+class RoomListResponse(BaseModel):
+    """Список комнат с пагинацией."""
+    rooms: Annotated[List[RoomResponse], Field(..., description="Список комнат")]
+    total: Annotated[int, Field(..., description="Общее количество", ge=0)]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RoomCreateResponse(BaseModel):
+    """Ответ на создание комнаты."""
+    room: RoomResponse
+    message: Annotated[str, Field(..., description="Сообщение об успехе")]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RoomUpdateResponse(BaseModel):
+    """Ответ на обновление комнаты."""
+    room: RoomResponse
+    message: Annotated[str, Field(..., description="Сообщение об успехе")]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RoomDeleteResponse(BaseModel):
+    """Ответ на удаление комнаты."""
+    message: Annotated[str, Field(..., description="Сообщение об успехе")]
