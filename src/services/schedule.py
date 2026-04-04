@@ -12,6 +12,7 @@ from src.repositories.UserRepository import UserRepository
 from src.repositories.RoomRepository import RoomRepository
 from src.schemas.LessonSlot import LessonSlotCreate, LessonSlotResponse, LessonSlotUpdate
 from src.schemas.User import UserRole
+from src.models.User import UserRole as ModelUserRole
 from src.services.exceptions import (
     InvalidRoleError,
     UserNotFoundError,
@@ -78,7 +79,7 @@ async def create_slot(
         logger.warning(f"Преподаватель с ID {slot_data.teacher_id} не найден")
         raise UserNotFoundError(user_id=slot_data.teacher_id)
 
-    if teacher.role != "TEACHER":
+    if teacher.role != ModelUserRole.TEACHER:
         logger.warning(f"Пользователь {slot_data.teacher_id} не является преподавателем")
         raise InvalidRoleError("Преподаватель должен иметь роль TEACHER")
 

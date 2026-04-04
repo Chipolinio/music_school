@@ -278,7 +278,7 @@ def mock_teacher_model():
     user.id = 2
     user.phone = "+79991234568"
     user.full_name = "Петров Пётр"
-    user.role = "TEACHER"  # строка, т.к. сервис сравнивает со строкой
+    user.role = DBUserRole.TEACHER
     user.is_active = True
     return user
 
