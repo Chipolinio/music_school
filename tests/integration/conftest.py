@@ -44,7 +44,8 @@ TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5436/music
 
 def _unique_phone():
     """Генерирует уникальный номер телефона."""
-    return f"+7999{uuid.uuid4().hex[:8]}"
+    import random
+    return f"+7999{random.randint(1000000, 9999999)}"
 
 
 @pytest.fixture(scope="session")
@@ -224,7 +225,7 @@ async def test_notification(session, notification_repo, test_student):
         user_id=test_student.id,
         title="Тестовое уведомление",
         message="Тестовое сообщение",
-        msg_type="INFO",
+        msg_type="info",
         is_read=False,
     )
     await session.flush()
