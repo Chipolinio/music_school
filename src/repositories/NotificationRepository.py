@@ -13,7 +13,7 @@ class NotificationRepository(BaseRepository[Notification]):
         user_id: int,
         title: str,
         message: str,
-        msg_type: str = "INFO",
+        msg_type: str = "info",
         is_read: bool = False,
     ) -> Notification:
         """Создаёт уведомление."""

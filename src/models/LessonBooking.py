@@ -16,10 +16,10 @@ class LessonBooking(BaseModel):
     __tablename__ = "lesson_bookings"
     slot_id: Mapped[int] = mapped_column(Integer, ForeignKey("lesson_slots.id"), nullable=False)
     student_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
-    status: Mapped[str] = mapped_column(
+    status: Mapped[Status] = mapped_column(
         Enum(Status),
         nullable=False,
-        server_default="booked")
+        server_default=Status.BOOKED.value)
     booked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     slot: Mapped["LessonSlot"] = relationship("LessonSlot", back_populates="lesson_bookings") # Было lesson_slots

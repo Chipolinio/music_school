@@ -1,9 +1,9 @@
 from typing import TypeVar, Type, Generic, Sequence, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.models import Base
+from src.models.Base import BaseModel
 
-T = TypeVar("T", bound=Base)
+T = TypeVar("T", bound=BaseModel)
 
 class BaseRepository(Generic[T]):
     def __init__(self, model: Type[T], session: AsyncSession):

@@ -1,12 +1,13 @@
 """
 Conftest для интеграционных тестов сервисного слоя.
 
-Использует тестовую БД (in-memory SQLite для async) с реальными репозиториями
+Использует тестовую БД (PostgreSQL) с реальными репозиториями
 и автоматическим откатом транзакций после каждого теста.
 """
 
 import pytest
 import asyncio
+import uuid
 from datetime import datetime, timezone, timedelta
 from contextlib import asynccontextmanager
 
@@ -15,9 +16,8 @@ from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
 )
-from sqlalchemy import StaticPool
 
-from src.models.Base import Base
+from src.models.Base import BaseModel
 from src.models.User import User, UserRole as DBUserRole
 from src.models.Room import Room
 from src.models.LessonSlot import LessonSlot
@@ -36,38 +36,39 @@ from src.utils.security import get_password_hash
 
 
 # =============================================================================
-# TEST DATABASE (SQLite in-memory для скорости, async через aiosqlite)
+# TEST DATABASE (PostgreSQL)
 # =============================================================================
 
-TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5436/music_school_test_db"
+
+
+def _unique_phone():
+    """Генерирует уникальный номер телефона."""
+    return f"+7999{uuid.uuid4().hex[:8]}"
 
 
 @pytest.fixture(scope="session")
-def event_loop():
-    """Создаёт event loop для сессии."""
-    loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
+def event_loop_policy():
+    """Использовать единый event loop policy."""
+    import asyncio
+    return asyncio.DefaultEventLoopPolicy()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def engine():
     """Создаёт движок для тестовой БД."""
-    engine = create_async_engine(
-        TEST_DATABASE_URL,
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
-    )
+    engine = create_async_engine(TEST_DATABASE_URL)
 
-    # Создаём таблицы
+    # Удаляем и создаём таблицы заново
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(BaseModel.metadata.drop_all)
+        await conn.run_sync(BaseModel.metadata.create_all)
 
     yield engine
 
     # Удаляем таблицы
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(BaseModel.metadata.drop_all)
 
     await engine.dispose()
 
@@ -81,7 +82,12 @@ async def session(engine):
 
     async with async_session() as session:
         yield session
-        await session.rollback()
+        # Откатываем все изменения после теста
+        # (для repository tests — rollback, для service tests — тоже rollback если не было commit)
+        try:
+            await session.rollback()
+        except Exception:
+            pass  # Транзакция уже закрыта (например, после commit в service layer)
 
 
 # =============================================================================
@@ -132,12 +138,12 @@ def notification_repo(session):
 async def test_student(session, user_repo):
     """Создаёт тестового студента."""
     created = await user_repo.create_user(
-        phone="+79991111111",
+        phone=_unique_phone(),
         full_name="Тестовый Студент",
         hashed_password=get_password_hash("Password123"),
         role="STUDENT",
     )
-    await session.commit()
+    await session.flush()
     await session.refresh(created)
     return created
 
@@ -146,12 +152,12 @@ async def test_student(session, user_repo):
 async def test_teacher(session, user_repo):
     """Создаёт тестового преподавателя."""
     created = await user_repo.create_user(
-        phone="+79992222222",
+        phone=_unique_phone(),
         full_name="Тестовый Преподаватель",
         hashed_password=get_password_hash("Password123"),
         role="TEACHER",
     )
-    await session.commit()
+    await session.flush()
     await session.refresh(created)
     return created
 
@@ -160,12 +166,12 @@ async def test_teacher(session, user_repo):
 async def test_admin(session, user_repo):
     """Создаёт тестового админа."""
     created = await user_repo.create_user(
-        phone="+79993333333",
+        phone=_unique_phone(),
         full_name="Тестовый Админ",
         hashed_password=get_password_hash("Password123"),
         role="ADMIN",
     )
-    await session.commit()
+    await session.flush()
     await session.refresh(created)
     return created
 
@@ -178,7 +184,7 @@ async def test_room(session, room_repo):
         capacity=3,
         is_active=True,
     )
-    await session.commit()
+    await session.flush()
     await session.refresh(created)
     return created
 
@@ -194,7 +200,7 @@ async def test_slot(session, lesson_slot_repo, test_teacher, test_room):
         end_time=now + timedelta(hours=2),
         max_participants=3,
     )
-    await session.commit()
+    await session.flush()
     await session.refresh(created)
     return created
 
@@ -206,7 +212,7 @@ async def test_booking(session, lesson_booking_repo, test_slot, test_student):
         slot_id=test_slot.id,
         student_id=test_student.id,
     )
-    await session.commit()
+    await session.flush()
     await session.refresh(created)
     return created
 
@@ -221,6 +227,6 @@ async def test_notification(session, notification_repo, test_student):
         msg_type="INFO",
         is_read=False,
     )
-    await session.commit()
+    await session.flush()
     await session.refresh(created)
     return created
