@@ -1,7 +1,7 @@
 from typing import Annotated, Optional, List
 from pydantic import BaseModel, Field, ConfigDict, field_validator, StrictInt
 
-from src.utils.validators import name_validator
+from src.utils.validators import generic_name_validator
 
 
 class RoomBase(BaseModel):
@@ -26,7 +26,7 @@ class RoomBase(BaseModel):
     @field_validator("name", mode="after")
     @classmethod
     def validate_room_name(cls, v):
-        return name_validator(v)
+        return generic_name_validator(v)
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
@@ -55,7 +55,7 @@ class RoomUpdate(BaseModel):
     def validate_room_name(cls, v):
         if v is None:
             return v
-        return name_validator(v)
+        return generic_name_validator(v)
 
     model_config = ConfigDict(str_strip_whitespace=True)
 

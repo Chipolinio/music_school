@@ -4,6 +4,8 @@ Music School Management System - API Application
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from src.api.error_handler import register_exception_handlers
 from src.api.router import api_router
@@ -40,12 +42,19 @@ def create_app() -> FastAPI:
     
     # Подключение роутеров
     app.include_router(api_router)
-    
+
+    # Раздача статических файлов
+    app.mount("/static", StaticFiles(directory="src/static"), name="static")
+
+    @app.get("/", include_in_schema=False)
+    async def serve_spa():
+        return FileResponse("src/static/index.html")
+
     # Health check
     @app.get("/health", tags=["Health"])
     async def health_check():
         return {"status": "ok"}
-    
+
     return app
 
 

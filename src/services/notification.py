@@ -125,7 +125,7 @@ async def create_notification(
         user_id=notification_data.user_id,
         title=notification_data.title,
         message=notification_data.message,
-        msg_type=notification_data.type.value if hasattr(notification_data, 'type') and notification_data.type else "INFO",
+        msg_type=notification_data.type.value if hasattr(notification_data, 'type') and notification_data.type else "info",
         is_read=notification_data.is_read,
     )
     await notification_repository.session.commit()

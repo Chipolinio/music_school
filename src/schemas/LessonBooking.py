@@ -24,6 +24,7 @@ class LessonCreate(LessonBookingBase):
 
 class LessonResponse(LessonBookingBase):
     id: Annotated[StrictInt, Field(..., ge=1, description="ID записи в БД")]
+    status: Annotated[str, Field(..., description="Статус брони")]
     booked_at: Annotated[datetime, Field(
         ...,
         description="Дата и время создания записи"

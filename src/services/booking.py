@@ -183,6 +183,7 @@ async def book_lesson(
         id=created_booking.id,
         slot_id=created_booking.slot_id,
         student_id=created_booking.student_id,
+        status=created_booking.status.value if hasattr(created_booking.status, 'value') else str(created_booking.status),
         booked_at=created_booking.booked_at,
     )
 
@@ -215,6 +216,7 @@ async def get_booking_by_id(
         id=booking.id,
         slot_id=booking.slot_id,
         student_id=booking.student_id,
+        status=booking.status.value if hasattr(booking.status, 'value') else str(booking.status),
         booked_at=booking.booked_at,
     )
 
@@ -241,6 +243,7 @@ async def get_student_bookings(
             id=b.id,
             slot_id=b.slot_id,
             student_id=b.student_id,
+            status=b.status.value if hasattr(b.status, 'value') else str(b.status),
             booked_at=b.booked_at,
         )
         for b in bookings

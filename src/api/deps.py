@@ -168,12 +168,13 @@ class RehearsalService:
     def __init__(self, session: AsyncSession):
         self.rehearsal_repo = RehearsalRepository(session)
         self.slot_repo = LessonSlotRepository(session)
+        self.room_repo = RoomRepository(session)
         self.user_repo = UserRepository(session)
         self.notification_repo = NotificationRepository(session)
 
     async def book(self, rehearsal_data, current_user_id: int, current_user_role: UserRole):
         return await rehearsal_service.book_rehearsal(
-            self.rehearsal_repo, self.slot_repo, self.user_repo, self.notification_repo,
+            self.rehearsal_repo, self.slot_repo, self.room_repo, self.user_repo, self.notification_repo,
             rehearsal_data, current_user_id, current_user_role
         )
 

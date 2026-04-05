@@ -5,6 +5,7 @@ import phonenumbers
 
 
 def name_validator(value: Any):
+    """Для ФИО — только буквы, Title Case."""
     if not isinstance(value, str):
         raise ValueError("Field must be a string")
     value = value.strip()
@@ -39,6 +40,39 @@ def name_validator(value: Any):
         raise ValueError("Space and underscore cannot be adjacent")
 
     return value.title()
+
+
+def generic_name_validator(value: Any):
+    """Для названий комнат и др. — буквы, цифры, пробелы, дефисы. Регистр сохраняется."""
+    if not isinstance(value, str):
+        raise ValueError("Field must be a string")
+    value = value.strip()
+    for i in value:
+        if not i.isalnum() and i != " " and i != "-" and i != "_":
+            raise ValueError(f"Invalid character: {i}")
+    if "  " in value:
+        raise ValueError("Cannot contain consecutive spaces")
+    if "--" in value:
+        raise ValueError("Cannot contain consecutive hyphens")
+    if "__" in value:
+        raise ValueError("Cannot contain consecutive underscores")
+    if value.startswith("-"):
+        raise ValueError("Cannot start with a hyphen")
+    if value.startswith("_"):
+        raise ValueError("Cannot start with an underscore")
+    if value.endswith("-"):
+        raise ValueError("Cannot end with a hyphen")
+    if value.endswith("_"):
+        raise ValueError("Cannot end with an underscore")
+    if " -" in value or "- " in value:
+        raise ValueError("Space and hyphen cannot be adjacent")
+    if " _" in value or "_ " in value:
+        raise ValueError("Space and underscore cannot be adjacent")
+
+    # Capitalize first letter only
+    if value:
+        return value[0].upper() + value[1:]
+    return value
 
 
 def phone_validator(value: Any):

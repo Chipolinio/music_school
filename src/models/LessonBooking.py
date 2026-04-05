@@ -22,5 +22,5 @@ class LessonBooking(BaseModel):
         server_default=Status.BOOKED.value)
     booked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
-    slot: Mapped["LessonSlot"] = relationship("LessonSlot", back_populates="lesson_bookings") # Было lesson_slots
-    student: Mapped["User"] = relationship("User", back_populates="lesson_bookings") # Было user
+    slot: Mapped["LessonSlot"] = relationship("LessonSlot", back_populates="lesson_bookings")
+    student: Mapped["User"] = relationship("User", back_populates="lesson_bookings")

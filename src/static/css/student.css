@@ -1,0 +1,98 @@
+/* Student dashboard */
+.dashboard-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.dashboard-header h1 {
+    margin-bottom: var(--spacing-xs);
+}
+
+.dashboard-welcome {
+    color: var(--color-text-light);
+    font-size: var(--font-size-lg);
+}
+
+.dashboard-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.next-lesson-card {
+    background-color: var(--color-card-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.next-lesson-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-light);
+    margin-bottom: var(--spacing-sm);
+}
+
+.next-lesson-info {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+}
+
+.next-lesson-details {
+    color: var(--color-text-light);
+    font-size: var(--font-size-sm);
+}
+
+.next-lesson-empty {
+    color: var(--color-text-light);
+    font-style: italic;
+}
+
+/* My bookings */
+.booking-item {
+    background-color: var(--color-card-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.booking-info {
+    flex: 1;
+}
+
+.booking-type {
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+}
+
+.booking-details {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-light);
+}
+
+.booking-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .booking-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+    }
+
+    .booking-actions {
+        width: 100%;
+    }
+
+    .booking-actions .btn {
+        flex: 1;
+    }
+}

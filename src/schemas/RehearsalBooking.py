@@ -48,8 +48,13 @@ class RehearsalCreate(RehearsalBase):
     pass
 
 
-class RehearsalResponse(RehearsalBase):
+class RehearsalResponse(BaseModel):
     id: Annotated[StrictInt, Field(..., ge=1, description="ID записи в БД")]
+    student_id: Annotated[StrictInt, Field(..., ge=1, description="ID ученика")]
+    room_id: Annotated[StrictInt, Field(..., ge=1, description="ID комнаты")]
+    start_time: Annotated[datetime, Field(..., description="Время начала")]
+    end_time: Annotated[datetime, Field(..., description="Время окончания")]
+    status: Annotated[str, Field(..., description="Статус брони")]
 
     model_config = ConfigDict(from_attributes=True)
 

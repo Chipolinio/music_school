@@ -10,6 +10,7 @@ from datetime import datetime
 
 from src.repositories.RehearsalBookingRepository import RehearsalRepository
 from src.repositories.LessonSlotRepository import LessonSlotRepository
+from src.repositories.RoomRepository import RoomRepository
 from src.repositories.UserRepository import UserRepository
 from src.repositories.NotificationRepository import NotificationRepository
 from src.schemas.RehearsalBooking import RehearsalCreate, RehearsalResponse
@@ -125,6 +126,7 @@ async def _create_notification(
 async def book_rehearsal(
     rehearsal_repository: RehearsalRepository,
     lesson_slot_repository: LessonSlotRepository,
+    room_repository: RoomRepository,
     user_repository: UserRepository,
     notification_repository: NotificationRepository,
     rehearsal_data: RehearsalCreate,
@@ -169,7 +171,7 @@ async def book_rehearsal(
             )
             raise InvalidRoleError("STUDENT может бронировать только себя")
 
-    room = await user_repository.get_by_id(rehearsal_data.room_id)
+    room = await room_repository.get_by_id(rehearsal_data.room_id)
     if room is None:
         logger.warning(f"Комната с ID {rehearsal_data.room_id} не найдена")
         raise RoomNotFoundError(rehearsal_data.room_id)
@@ -222,6 +224,7 @@ async def book_rehearsal(
         room_id=created_booking.room_id,
         start_time=created_booking.start_time,
         end_time=created_booking.end_time,
+        status=created_booking.status.value if hasattr(created_booking.status, 'value') else str(created_booking.status),
     )
 
 
@@ -255,6 +258,7 @@ async def get_rehearsal_by_id(
         room_id=booking.room_id,
         start_time=booking.start_time,
         end_time=booking.end_time,
+        status=booking.status.value if hasattr(booking.status, 'value') else str(booking.status),
     )
 
 
@@ -282,6 +286,7 @@ async def get_student_rehearsals(
             room_id=b.room_id,
             start_time=b.start_time,
             end_time=b.end_time,
+            status=b.status.value if hasattr(b.status, 'value') else str(b.status),
         )
         for b in bookings
     ]
