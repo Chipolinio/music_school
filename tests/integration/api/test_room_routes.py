@@ -49,7 +49,9 @@ class TestGetRoom:
         response = await client.get(f"/rooms/{test_room.id}")
         assert response.status_code == 200
         data = response.json()
-        assert data["name"] == test_room.name.title()  # name_validator делает .title()
+        # generic_name_validator делает капитализацию только первой буквы
+        expected_name = test_room.name[0].upper() + test_room.name[1:]
+        assert data["name"] == expected_name
         assert data["capacity"] == test_room.capacity
 
     @pytest.mark.asyncio
@@ -83,7 +85,8 @@ class TestCreateRoom:
         })
         assert response.status_code == 201
         data = response.json()
-        assert data["room"]["name"] == "Класс Фортепиано"  # name_validator делает .title()
+        # generic_name_validator делает капитализацию только первой буквы
+        assert data["room"]["name"] == "Класс фортепиано"
         assert data["message"] == "Комната успешно создана"
 
     @pytest.mark.asyncio
@@ -107,7 +110,8 @@ class TestUpdateRoom:
         response = await client.patch(f"/rooms/{test_room.id}", json={"name": "Новое название"})
         assert response.status_code == 200
         data = response.json()
-        assert data["room"]["name"] == "Новое Название"
+        # generic_name_validator делает капитализацию только первой буквы
+        assert data["room"]["name"] == "Новое название"
 
     @pytest.mark.asyncio
     async def test_update_room_not_found(self, client):

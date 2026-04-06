@@ -26,14 +26,12 @@ class TestBookRehearsal:
 
     @pytest.mark.asyncio
     async def test_book_rehearsal_success(self, mock_rehearsal_repo, mock_lesson_slot_repo,
-                                            mock_user_repo, mock_notification_repo,
+                                            mock_room_repo, mock_user_repo, mock_notification_repo,
                                             rehearsal_create_data, mock_user_model):
         """Тест успешного бронирования репетиции."""
         # Arrange
         mock_user_repo.get_by_id.return_value = mock_user_model
-
-        # В rehearsal.py room проверяется через user_repository.get_by_id (баг в коде)
-        mock_user_repo.get_by_id.return_value = mock_user_model  # для room check тоже user_repo
+        mock_room_repo.get_by_id.return_value = MagicMock()  # room exists
 
         mock_rehearsal_repo.find_room_conflicts.return_value = []
         mock_rehearsal_repo.find_student_conflicts.return_value = []
@@ -43,57 +41,55 @@ class TestBookRehearsal:
         created_booking.id = 1
         created_booking.student_id = 1
         created_booking.room_id = 1
+        created_booking.status = BookingStatus.BOOKED
         now = datetime.now(timezone.utc)
         created_booking.start_time = now + timedelta(hours=1)
         created_booking.end_time = now + timedelta(hours=2)
         mock_rehearsal_repo.create_rehearsal.return_value = created_booking
 
-        # Act — patch get_by_id чтобы для room тоже возвращал что-то
-        with MagicMock() as room_mock:
-            mock_user_repo.get_by_id.side_effect = [mock_user_model, room_mock]
+        response = await book_rehearsal(
+            mock_rehearsal_repo, mock_lesson_slot_repo, mock_room_repo,
+            mock_user_repo, mock_notification_repo, rehearsal_create_data,
+            current_user_id=1, current_user_role=UserRole.STUDENT,
+        )
 
-            response = await book_rehearsal(
-                mock_rehearsal_repo, mock_lesson_slot_repo, mock_user_repo,
-                mock_notification_repo, rehearsal_create_data,
-                current_user_id=1, current_user_role=UserRole.STUDENT,
-            )
-
-            # Assert
-            assert isinstance(response, RehearsalResponse)
-            assert response.student_id == 1
-            assert response.room_id == 1
+        # Assert
+        assert isinstance(response, RehearsalResponse)
+        assert response.student_id == 1
+        assert response.room_id == 1
 
     @pytest.mark.asyncio
     async def test_book_rehearsal_student_not_found(self, mock_rehearsal_repo, mock_lesson_slot_repo,
-                                                      mock_user_repo, mock_notification_repo,
+                                                      mock_room_repo, mock_user_repo, mock_notification_repo,
                                                       rehearsal_create_data):
         """Тест когда студент не найден."""
         mock_user_repo.get_by_id.return_value = None
 
         with pytest.raises(UserNotFoundError):
             await book_rehearsal(
-                mock_rehearsal_repo, mock_lesson_slot_repo, mock_user_repo,
-                mock_notification_repo, rehearsal_create_data,
+                mock_rehearsal_repo, mock_lesson_slot_repo, mock_room_repo,
+                mock_user_repo, mock_notification_repo, rehearsal_create_data,
                 current_user_id=1, current_user_role=UserRole.STUDENT,
             )
 
     @pytest.mark.asyncio
     async def test_book_rehearsal_room_not_found(self, mock_rehearsal_repo, mock_lesson_slot_repo,
-                                                    mock_user_repo, mock_notification_repo,
+                                                    mock_room_repo, mock_user_repo, mock_notification_repo,
                                                     rehearsal_create_data, mock_user_model):
         """Тест когда комната не найдена."""
-        mock_user_repo.get_by_id.side_effect = [mock_user_model, None]
+        mock_user_repo.get_by_id.return_value = mock_user_model
+        mock_room_repo.get_by_id.return_value = None
 
         with pytest.raises(RoomNotFoundError):
             await book_rehearsal(
-                mock_rehearsal_repo, mock_lesson_slot_repo, mock_user_repo,
-                mock_notification_repo, rehearsal_create_data,
+                mock_rehearsal_repo, mock_lesson_slot_repo, mock_room_repo,
+                mock_user_repo, mock_notification_repo, rehearsal_create_data,
                 current_user_id=1, current_user_role=UserRole.STUDENT,
             )
 
     @pytest.mark.asyncio
     async def test_book_rehearsal_student_cannot_book_other(self, mock_rehearsal_repo, mock_lesson_slot_repo,
-                                                              mock_user_repo, mock_notification_repo,
+                                                              mock_room_repo, mock_user_repo, mock_notification_repo,
                                                               rehearsal_create_data, mock_user_model):
         """Тест: STUDENT не может бронировать для другого."""
         mock_user_repo.get_by_id.return_value = mock_user_model
@@ -107,40 +103,42 @@ class TestBookRehearsal:
 
         with pytest.raises(InvalidRoleError):
             await book_rehearsal(
-                mock_rehearsal_repo, mock_lesson_slot_repo, mock_user_repo,
-                mock_notification_repo, other_rehearsal,
+                mock_rehearsal_repo, mock_lesson_slot_repo, mock_room_repo,
+                mock_user_repo, mock_notification_repo, other_rehearsal,
                 current_user_id=1, current_user_role=UserRole.STUDENT,
             )
 
     @pytest.mark.asyncio
     async def test_book_rehearsal_room_conflict(self, mock_rehearsal_repo, mock_lesson_slot_repo,
-                                                  mock_user_repo, mock_notification_repo,
+                                                  mock_room_repo, mock_user_repo, mock_notification_repo,
                                                   rehearsal_create_data, mock_user_model):
         """Тест конфликта комнаты."""
-        mock_user_repo.get_by_id.side_effect = [mock_user_model, MagicMock()]
+        mock_user_repo.get_by_id.return_value = mock_user_model
+        mock_room_repo.get_by_id.return_value = MagicMock()
         mock_rehearsal_repo.find_room_conflicts.return_value = [MagicMock()]
 
         with pytest.raises(BookingConflictError):
             await book_rehearsal(
-                mock_rehearsal_repo, mock_lesson_slot_repo, mock_user_repo,
-                mock_notification_repo, rehearsal_create_data,
+                mock_rehearsal_repo, mock_lesson_slot_repo, mock_room_repo,
+                mock_user_repo, mock_notification_repo, rehearsal_create_data,
                 current_user_id=1, current_user_role=UserRole.STUDENT,
             )
 
     @pytest.mark.asyncio
     async def test_book_rehearsal_student_conflict(self, mock_rehearsal_repo, mock_lesson_slot_repo,
-                                                     mock_user_repo, mock_notification_repo,
+                                                     mock_room_repo, mock_user_repo, mock_notification_repo,
                                                      rehearsal_create_data, mock_user_model):
         """Тест конфликта у студента."""
-        mock_user_repo.get_by_id.side_effect = [mock_user_model, MagicMock()]
+        mock_user_repo.get_by_id.return_value = mock_user_model
+        mock_room_repo.get_by_id.return_value = MagicMock()
         mock_rehearsal_repo.find_room_conflicts.return_value = []
         mock_lesson_slot_repo.find_room_lesson_conflicts.return_value = []
         mock_rehearsal_repo.find_student_conflicts.return_value = [MagicMock()]
 
         with pytest.raises(BookingConflictError):
             await book_rehearsal(
-                mock_rehearsal_repo, mock_lesson_slot_repo, mock_user_repo,
-                mock_notification_repo, rehearsal_create_data,
+                mock_rehearsal_repo, mock_lesson_slot_repo, mock_room_repo,
+                mock_user_repo, mock_notification_repo, rehearsal_create_data,
                 current_user_id=1, current_user_role=UserRole.STUDENT,
             )
 

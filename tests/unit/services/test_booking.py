@@ -41,6 +41,7 @@ class TestBookLesson:
         created_booking.id = 1
         created_booking.slot_id = 1
         created_booking.student_id = 1
+        created_booking.status = BookingStatus.BOOKED
         created_booking.booked_at = datetime.now(timezone.utc)
         mock_lesson_booking_repo.create_booking.return_value = created_booking
 
@@ -102,6 +103,7 @@ class TestBookLesson:
         created_booking.id = 1
         created_booking.slot_id = 1
         created_booking.student_id = 1
+        created_booking.status = BookingStatus.BOOKED
         created_booking.booked_at = datetime.now(timezone.utc)
         mock_lesson_booking_repo.create_booking.return_value = created_booking
 

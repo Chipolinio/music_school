@@ -26,7 +26,7 @@ class TestGetRoomById:
 
         assert isinstance(response, RoomResponse)
         assert response.id == 1
-        assert response.name == "Тестовая Комната"
+        assert response.name == "Тестовая комната"
         assert response.capacity == 5
 
     @pytest.mark.asyncio
@@ -51,7 +51,7 @@ class TestGetAllRooms:
         result = await get_all_rooms(mock_room_repo, skip=0, limit=10)
 
         assert len(result) == 1
-        assert result[0].name == "Тестовая Комната"
+        assert result[0].name == "Тестовая комната"
 
     @pytest.mark.asyncio
     async def test_get_all_rooms_empty(self, mock_room_repo):
@@ -94,7 +94,7 @@ class TestCreateRoom:
 
         assert isinstance(response, RoomResponse)
         assert response.id == 1
-        assert response.name == "Тестовая Комната"
+        assert response.name == "Тестовая комната"
         mock_room_repo.session.commit.assert_called_once()
 
 
@@ -116,7 +116,7 @@ class TestUpdateRoom:
         update_data = RoomUpdate(name="Новое название", capacity=10)
         response = await update_room(mock_room_repo, 1, update_data)
 
-        assert response.name == "Новое Название"
+        assert response.name == "Новое название"
         assert response.capacity == 10
 
     @pytest.mark.asyncio
