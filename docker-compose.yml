@@ -1,15 +1,13 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15
     container_name: music_school_db
     environment:
-      POSTGRES_DB: music_school_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-music_school_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
-      - "5435:5432"
+      - "${POSTGRES_PORT:-5435}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -17,6 +15,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - music_school_network
 
   postgres_test:
     image: postgres:15
@@ -32,6 +32,71 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - music_school_network
+
+  # Сервис для запуска миграций
+  migrate:
+    build: .
+    container_name: music_school_migrate
+    command: alembic upgrade head
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - music_school_network
+
+  # Сервис для создания первого администратора
+  create-admin:
+    build: .
+    container_name: music_school_create_admin
+    command: python scripts/create_admin.py
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    volumes:
+      - .:/app
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - music_school_network
+
+  # Основное приложение
+  web:
+    build: .
+    container_name: music_school_web
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      create-admin:
+        condition: service_completed_successfully
+    networks:
+      - music_school_network
 
 volumes:
+  # Существующий volume с данными БД
+  # Если нужно подключить существующий volume, используйте: docker volume create --name music_school_postgres_data -d local
   postgres_data:
+    name: music_school_postgres_data
+
+networks:
+  music_school_network:
+    driver: bridge

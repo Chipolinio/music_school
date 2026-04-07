@@ -11,8 +11,9 @@ from alembic import context
 # Добавляем проект в path для импорта настроек
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-# Загружаем .env с переопределением переменных окружения
-load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env", override=True)
+# Загружаем .env, но не переопределяем переменные окружения.
+# В Docker переменные задаются через docker-compose environment.
+load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env")
 
 from settings import settings
 from src.models.Base import BaseModel

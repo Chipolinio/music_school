@@ -4,8 +4,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
 
 BASE_DIR = Path(__file__).resolve().parent
-# Переопределяем переменные окружения значениями из .env
-load_dotenv(dotenv_path=str(BASE_DIR / ".env"), override=True)
+# Загружаем .env, но не переопределяем переменные окружения.
+# В Docker переменные задаются через docker-compose environment.
+# При локальном запуске — берутся из .env файла.
+load_dotenv(dotenv_path=str(BASE_DIR / ".env"))
 
 class Settings(BaseSettings):
     POSTGRES_DB: str
