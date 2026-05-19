@@ -5,7 +5,8 @@ from pydantic import BaseModel, Field, ConfigDict, field_validator, model_valida
 from src.utils.validators import date_validator
 
 
-class LessonSlotBase(BaseModel):
+class LessonSlotFields(BaseModel):
+    """Поля слота без валидаторов ввода — для ответов API и чтения из БД."""
     teacher_id: Annotated[StrictInt, Field(
         ...,
         ge=1,
@@ -31,15 +32,19 @@ class LessonSlotBase(BaseModel):
         description="Максимальное количество учеников в слоте"
     )]
 
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+
+class LessonSlotCreate(LessonSlotFields):
     @field_validator("start_time", "end_time", mode="after")
     @classmethod
     def validate_dates(cls, v):
-        """Проверяем, что дата не в прошлом """
+        """Проверяем, что дата не в прошлом (только при создании)."""
         return date_validator(v)
 
     @model_validator(mode="after")
-    def check_time_range(self) -> "LessonSlotBase":
-        """Проверяем, что урок не заканчивается раньше, чем начался"""
+    def check_time_range(self) -> "LessonSlotCreate":
+        """Проверяем, что урок не заканчивается раньше, чем начался."""
         if self.end_time <= self.start_time:
             raise ValueError("Время окончания должно быть строго позже времени начала")
 
@@ -49,14 +54,8 @@ class LessonSlotBase(BaseModel):
 
         return self
 
-    model_config = ConfigDict(str_strip_whitespace=True)
 
-
-class LessonSlotCreate(LessonSlotBase):
-    pass
-
-
-class LessonSlotResponse(LessonSlotBase):
+class LessonSlotResponse(LessonSlotFields):
     id: Annotated[StrictInt, Field(..., ge=1, description="ID записи в БД")]
 
     model_config = ConfigDict(from_attributes=True)
