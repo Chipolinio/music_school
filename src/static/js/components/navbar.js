@@ -18,7 +18,10 @@ async function renderNavbar() {
     
     nav.innerHTML = `
         <div class="container">
-            <a href="${brandLink}" class="navbar-brand">Music School</a>
+            <a href="${brandLink}" class="navbar-brand">
+                <span class="navbar-brand-mark">♪</span>
+                Music School
+            </a>
             <div class="navbar-nav">
                 ${getNavLinks()}
             </div>
@@ -31,6 +34,15 @@ async function renderNavbar() {
     if (currentUser) {
         initNotifications();
     }
+
+    updateActiveNav();
+}
+
+function updateActiveNav() {
+    const hash = window.location.hash || '#home';
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === hash);
+    });
 }
 
 function getNavLinks() {
@@ -68,7 +80,7 @@ function getNavLinks() {
     return `
         ${links}
         <div class="notifications-wrapper" id="notifications-wrapper"></div>
-        <span class="text-muted text-sm">${currentUser.full_name}</span>
+        <span class="navbar-user">${currentUser.full_name}</span>
         <button class="btn btn-outline btn-sm" id="logout-btn">Выйти</button>
     `;
 }

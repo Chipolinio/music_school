@@ -1,25 +1,45 @@
 :root {
-    --color-bg: #FFFDF6;
-    --color-primary: #DB8220;
-    --color-primary-hover: #C4731A;
-    --color-secondary: #A47764;
-    --color-text: #56453E;
-    --color-text-light: #8B7568;
-    --color-white: #FFFFFF;
-    --color-danger: #C0392B;
-    --color-danger-hover: #A93226;
-    --color-success: #27AE60;
-    --color-success-hover: #219653;
-    --color-warning: #F39C12;
-    --color-muted: #E8DDD3;
-    --color-border: #D4C5B5;
-    --color-input-bg: #FFFFFF;
-    --color-card-bg: #FFFFFF;
-    --color-overlay: rgba(86, 69, 62, 0.5);
-    --radius-sm: 4px;
-    --radius: 8px;
-    --radius-lg: 12px;
-    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    --color-wine: #6b3344;
+    --color-wine-hover: #562838;
+    --color-wine-deep: #451f2c;
+    --color-wine-soft: #f6eef1;
+    --color-wine-muted: #e4cdd3;
+
+    --color-slate: #445568;
+    --color-slate-hover: #354556;
+    --color-slate-deep: #2c3948;
+    --color-slate-soft: #eef2f6;
+    --color-slate-muted: #c5ced8;
+
+    --color-bg: #f5f4f7;
+    --color-primary: var(--color-wine);
+    --color-primary-hover: var(--color-wine-hover);
+    --color-secondary: var(--color-slate);
+    --color-text: #2a3340;
+    --color-text-light: #5c6b7a;
+    --color-white: #ffffff;
+    --color-danger: #9b3a4a;
+    --color-danger-hover: #7e2e3c;
+    --color-success: #3d7a5f;
+    --color-success-hover: #326350;
+    --color-warning: #c48a3a;
+    --color-muted: #eef1f5;
+    --color-border: #c5ced8;
+    --color-input-bg: #ffffff;
+    --color-card-bg: #ffffff;
+    --color-overlay: rgba(44, 57, 72, 0.48);
+
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+
+    --shadow-sm: 0 1px 2px rgba(68, 85, 104, 0.06);
+    --shadow: 0 10px 28px rgba(68, 85, 104, 0.08), 0 2px 6px rgba(68, 85, 104, 0.04);
+    --shadow-lg: 0 24px 56px rgba(68, 85, 104, 0.16), 0 6px 16px rgba(107, 51, 68, 0.06);
+
+    --font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
     --font-size-xs: 0.75rem;
     --font-size-sm: 0.875rem;
     --font-size-base: 1rem;
@@ -27,12 +47,14 @@
     --font-size-xl: 1.25rem;
     --font-size-2xl: 1.5rem;
     --font-size-3xl: 1.875rem;
+
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
     --spacing-2xl: 3rem;
+
     --transition: 0.2s ease;
     --max-width: 1200px;
 }

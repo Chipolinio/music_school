@@ -1,23 +1,46 @@
+# Virtual environments
 .venv/
 venv/
 env/
 
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
 .Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Tests and coverage
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
+.tox/
+coverage.xml
 
+# Environment and secrets
 .env
-.env.local
+.env.*
+!.env.example
+jwt_tokens/*.pem
+*.pem
 
+# Database dumps
+backup.sql
+*.dump
+
+# IDE and OS
 .vscode/
 .idea/
 .DS_Store
+Thumbs.db
+*.swp
+*.swo
 
+# Logs and local tooling
 *.log
 /.instuctions
 /.output

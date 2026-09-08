@@ -4,10 +4,13 @@ function showModal(title, message, buttons = [], type = '') {
     container.className = 'active';
     
     const typeClass = type ? `modal-${type}` : '';
+    const icon = type === 'error' ? '!' : type === 'success' ? '✓' : '♪';
     
     container.innerHTML = `
         <div class="modal-overlay"></div>
         <div class="modal ${typeClass}">
+            <button class="modal-close" type="button" aria-label="Закрыть">&times;</button>
+            <div class="modal-icon">${icon}</div>
             <h3 class="modal-title">${title}</h3>
             <p class="modal-text">${message}</p>
             <div class="modal-actions">
@@ -18,6 +21,7 @@ function showModal(title, message, buttons = [], type = '') {
     
     // Обработчик клика по overlay
     container.querySelector('.modal-overlay').addEventListener('click', closeModal);
+    container.querySelector('.modal-close').addEventListener('click', closeModal);
     
     // Обработчики кнопок
     buttons.forEach(btn => {

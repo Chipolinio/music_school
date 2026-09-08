@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from pathlib import Path
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-import os
 
 BASE_DIR = Path(__file__).resolve().parent
 # Загружаем .env, но не переопределяем переменные окружения.
@@ -18,7 +18,16 @@ class Settings(BaseSettings):
 
     JWT_PRIVATE_KEY: Path = BASE_DIR / "jwt_tokens" / "jwt-private.pem"
     JWT_PUBLIC_KEY: Path = BASE_DIR / "jwt_tokens" / "jwt-public.pem"
+    JWT_LIFETIME_SECONDS: int = 1800
     ALGORITHM: str = "RS256"
+
+    @field_validator("JWT_PRIVATE_KEY", "JWT_PUBLIC_KEY", mode="before")
+    @classmethod
+    def resolve_jwt_key_path(cls, value):
+        path = Path(value)
+        if not path.is_absolute():
+            return BASE_DIR / path
+        return path
 
     @property
     def DATABASE_URL(self) -> str:

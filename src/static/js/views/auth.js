@@ -7,20 +7,24 @@ function renderHome(app) {
             <div class="page-content">
                 <div class="container">
                     <div class="home-hero">
+                        <p class="home-kicker">Music School</p>
                         <h1>Музыкальная школа</h1>
                         <p>Записывайтесь на уроки, бронируйте репетиционные комнаты и отслеживайте своё расписание</p>
                         <a href="#register" class="btn btn-primary btn-lg">Начать обучение</a>
                     </div>
                     <div class="home-features">
                         <div class="home-feature-card">
+                            <div class="home-feature-icon">♪</div>
                             <h3>Индивидуальные уроки</h3>
                             <p>Занимайтесь с опытными преподавателями по вашему направлению</p>
                         </div>
                         <div class="home-feature-card">
+                            <div class="home-feature-icon">⌂</div>
                             <h3>Репетиционные комнаты</h3>
                             <p>Бронируйте оборудованные залы для самостоятельных занятий</p>
                         </div>
                         <div class="home-feature-card">
+                            <div class="home-feature-icon">◷</div>
                             <h3>Удобное расписание</h3>
                             <p>Выбирайте удобное время и отслеживайте свои записи онлайн</p>
                         </div>

@@ -4,6 +4,7 @@ API роуты для аутентификации и регистрации.
 
 from fastapi import APIRouter, Depends, Request, Response, status
 
+from settings import settings
 from src.api.deps import get_auth_service, AuthService, get_current_user_from_request
 from src.schemas.User import UserCreate, UserResponse
 from src.schemas.Auth import LoginRequest, AuthResponse, LogoutResponse, TokenVerifyResponse
@@ -31,7 +32,7 @@ async def register(
         httponly=True,
         samesite="lax",
         secure=False,
-        max_age=1800,
+        max_age=settings.JWT_LIFETIME_SECONDS,
         path="/",
     )
 
@@ -57,7 +58,7 @@ async def login(
         httponly=True,
         samesite="lax",
         secure=False,
-        max_age=1800,
+        max_age=settings.JWT_LIFETIME_SECONDS,
         path="/",
     )
 

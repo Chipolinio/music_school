@@ -89,6 +89,11 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5435
+
+JWT_PRIVATE_KEY=jwt_tokens/jwt-private.pem
+JWT_PUBLIC_KEY=jwt_tokens/jwt-public.pem
+JWT_LIFETIME_SECONDS=1800
+ALGORITHM=RS256
 ```
 
 > **Примечание:** при запуске через `docker compose` значения `POSTGRES_HOST` и `POSTGRES_PORT` переопределяются внутри контейнеров автоматически (`postgres:5432`).
@@ -231,6 +236,7 @@ SPA на чистом JavaScript без фреймворков:
 | Переменная | Описание |
 |------------|----------|
 | `POSTGRES_*` | Подключение к БД |
-| `JWT_PRIVATE_KEY_PATH` | Путь к RSA приватному ключу |
-| `JWT_PUBLIC_KEY_PATH` | Путь к RSA публичному ключу |
-| `JWT_LIFETIME_SECONDS` | Время жизни токена (по умолчанию 1800)
+| `JWT_PRIVATE_KEY` | Путь к RSA приватному ключу |
+| `JWT_PUBLIC_KEY` | Путь к RSA публичному ключу |
+| `JWT_LIFETIME_SECONDS` | Время жизни токена (по умолчанию 1800) |
+| `ALGORITHM` | Алгоритм JWT (по умолчанию RS256) |

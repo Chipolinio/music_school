@@ -77,8 +77,7 @@ async function selectTeacher(teacherId) {
     
     // Подсвечиваем выбранного преподавателя
     document.querySelectorAll('.teacher-card').forEach(card => {
-        card.style.borderColor = card.dataset.id === teacherId ? 'var(--color-primary)' : '';
-        card.style.borderWidth = card.dataset.id === teacherId ? '2px' : '';
+        card.classList.toggle('selected', card.dataset.id === teacherId);
     });
     
     const slotsContainer = document.getElementById('slots-container');
@@ -214,15 +213,17 @@ async function renderRehearsal(app) {
             <div class="page-content">
                 <div class="container">
                     <h2 class="section-title">Аренда репетиционной комнаты</h2>
-                    <div class="form-group">
-                        <label class="form-label">Комната</label>
-                        <select class="form-select" id="room-select">
-                            <option value="">Выберите комнату</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Дата</label>
-                        <input type="date" class="form-input" id="rehearsal-date">
+                    <div class="card filters-card">
+                        <div class="form-group">
+                            <label class="form-label">Комната</label>
+                            <select class="form-select" id="room-select">
+                                <option value="">Выберите комнату</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Дата</label>
+                            <input type="date" class="form-input" id="rehearsal-date">
+                        </div>
                     </div>
                     <h3 class="mt-lg mb-md">Доступное время</h3>
                     <div id="time-slots" class="grid grid-4"></div>

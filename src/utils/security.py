@@ -74,17 +74,19 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     )
 
 
-def create_token(data_dict: dict, duration: int = 1800) -> str:
+def create_token(data_dict: dict, duration: int | None = None) -> str:
     """
     Создаёт JWT-токен.
 
     Args:
         data_dict: Данные для токена
-        duration: Время жизни в секундах (по умолчанию 30 минут)
+        duration: Время жизни в секундах (по умолчанию JWT_LIFETIME_SECONDS)
 
     Returns:
         str: JWT-токен
     """
+    if duration is None:
+        duration = settings.JWT_LIFETIME_SECONDS
     data = data_dict.copy()
     expire = datetime.now(timezone.utc) + timedelta(seconds=duration)
     data.update({"exp": expire})
@@ -108,7 +110,7 @@ def set_auth_token(
     response: Response,
     token: str,
     key: str,
-    max_age: int = 1800,
+    max_age: int | None = None,
 ):
     """
     Устанавливает cookie с JWT-токеном.
@@ -119,6 +121,8 @@ def set_auth_token(
         key: Имя cookie
         max_age: Время жизни cookie в секундах
     """
+    if max_age is None:
+        max_age = settings.JWT_LIFETIME_SECONDS
     response.set_cookie(
         key=key,
         value=token,

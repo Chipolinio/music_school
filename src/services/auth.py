@@ -10,6 +10,7 @@ from typing import Tuple
 from src.repositories.UserRepository import UserRepository
 from src.schemas.User import UserCreate, UserResponse
 from src.schemas.User import UserRole as UserRoleSchema
+from settings import settings
 from src.utils.security import get_password_hash, verify_password, create_token, decode_token
 from src.services.exceptions import (
     AuthenticationError,
@@ -48,7 +49,7 @@ async def register(
 
     token = create_token(
         data_dict={"sub": str(created_user.id), "role": created_user.role.value},
-        duration=1800,
+        duration=settings.JWT_LIFETIME_SECONDS,
     )
 
     response = UserResponse(
@@ -99,7 +100,7 @@ async def login(
 
     token = create_token(
         data_dict={"sub": str(user.id), "role": user.role.value},
-        duration=1800,
+        duration=settings.JWT_LIFETIME_SECONDS,
     )
     logger.info(f"Успешный вход пользователя: {phone}")
 
