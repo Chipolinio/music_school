@@ -57,6 +57,7 @@ API Routes → Dependency Layer → Service Layer → Repository Layer → Datab
 │   ├── utils/               # JWT, пароль, валидаторы
 │   └── main.py              # Точка входа FastAPI
 ├── tests/                   # Unit + Integration тесты
+├── .env.example             # Шаблон переменных окружения
 ├── docker-compose.yml       # Docker Compose (PostgreSQL + приложение)
 ├── Dockerfile               # Образ приложения
 ├── requirements.txt         # Зависимости
@@ -106,11 +107,14 @@ docker compose up -d --build
 
 Флаг `-d` запускает контейнеры в фоновом режиме. Без него процесс займёт терминал, и при `Ctrl+C` всё остановится.
 
+Сервисы Compose: `postgres`, `postgres_test` (только для тестов), одноразовые `migrate` и `create-admin`, постоянный `web`.
+
 Что произойдёт:
 1. Docker соберёт образ приложения (установит зависимости из `requirements.txt`)
-2. Поднимется PostgreSQL контейнер (данные хранятся в Docker volume `music_school_postgres_data`)
-3. Применятся Alembic миграции
-4. Запустится FastAPI приложение на порту **8000**
+2. Поднимется PostgreSQL (`postgres`, volume `music_school_postgres_data`)
+3. Сервис `migrate` применит Alembic-миграции
+4. Сервис `create-admin` создаст первого администратора (если его ещё нет)
+5. Запустится FastAPI (`web`) на порту **8000**
 
 Откройте **http://127.0.0.1:8000/** — фронтенд SPA, или **http://127.0.0.1:8000/docs** — Swagger API.
 
@@ -129,11 +133,16 @@ docker compose up -d postgres
 # 2. Применить миграции
 alembic upgrade head
 
-# 3. Запустить приложение
+# 3. (опционально) Создать администратора
+python scripts/create_admin.py
+
+# 4. Запустить приложение
 uvicorn src.main:app --reload
 ```
 
 Приложение будет доступно на **http://127.0.0.1:8000/**
+
+> RSA-ключи JWT (`jwt_tokens/*.pem`) создаются автоматически при первом запуске, если файлов ещё нет (см. `src/utils/security.py`).
 
 ## Первый администратор
 
@@ -192,11 +201,12 @@ ADMIN_PASSWORD = "admin123456"
 | Rehearsals | `/rehearsals` | Бронирование репетиций |
 | Notifications | `/notifications` | Уведомления |
 | Reports | `/reports` | Отчёты и CSV-экспорт |
+| Health | `/health` | Проверка доступности API |
 
 ## Аутентификация
 
-- JWT (RS256) в **httpOnly Cookie** — фронтенд не имеет доступа к токену
-- Время жизни токена: 30 минут
+- JWT (RS256) в **httpOnly Cookie** (`jwt_token`) — фронтенд не имеет доступа к токену
+- Время жизни токена: по умолчанию 30 минут (`JWT_LIFETIME_SECONDS=1800`)
 - Автоматическая отправка cookie при каждом запросе (`credentials: 'include'`)
 
 ## Роли
